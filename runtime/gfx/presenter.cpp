@@ -256,6 +256,12 @@ bool Presenter::init(const std::string& title, int width, int height, bool headl
         // window/taskbar icon: the executable's icon resource 1 (runtime/boot/mh3u.rc)
         SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON, "1");
         SDL_SetHint(SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL, "1");
+#ifdef __ANDROID__
+        // SDL's Android activity replaces the manifest's screenOrientation when the window is created: a resizable window
+        // with no orientation hint gets "all orientations", so the game could come up (or rotate) in portrait. Allow
+        // landscape only, both directions, before the window exists.
+        SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
         if (!SDL_Init(SDL_INIT_VIDEO)) return fail(std::string("SDL_Init: ") + SDL_GetError());
         // high pixel density: on a scaled desktop (Wayland at 150 % / 200 %) the swapchain has the screen's real pixels;
         // without it the picture was drawn at the logical size and stretched by the compositor, blurry (issue #13)
